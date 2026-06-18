@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Key Boshqaruv Tizimi</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@400;500;600&display=swap');
+
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --card: #1a1a26;
+    --border: #2a2a3d;
+    --accent: #6c63ff;
+    --accent2: #00d4aa;
+    --danger: #ff4757;
+    --warn: #ffa502;
+    --text: #e8e8f0;
+    --muted: #7070a0;
+    --green: #2ed573;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* LOGIN SCREEN */
+  #login-screen {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: radial-gradient(ellipse at 50% 0%, #1a1040 0%, var(--bg) 70%);
+  }
+
+  .login-box {
+    width: 380px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 40px;
+    text-align: center;
+  }
+
+  .login-logo {
+    width: 64px; height: 64px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 16px;
+    margin: 0 auto 20px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px;
+  }
+
+  .login-box h2 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 20px;
+    margin-bottom: 6px;
+    color: var(--text);
+  }
+
+  .login-box p {
+    color: var(--muted);
+    font-size: 13px;
+    margin-bottom: 28px;
+  }
+
+  .input-wrap {
+    position: relative;
+    margin-bottom: 16px;
+  }
+
+  .input-wrap input {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 15px;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--text);
+    outline: none;
+    letter-spacing: 2px;
+    transition: border-color 0.2s;
+  }
+
+  .input-wrap input:focus {
+    border-color: var(--accent);
+  }
+
+  .input-wrap .toggle-pw {
+    position: absolute; right: 12px; top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer; color: var(--muted); font-size: 18px;
+    background: none; border: none;
+  }
+
+  .btn-primary {
+    width: 100%;
+    background: linear-gradient(135deg, var(--accent), #8b5cf6);
+    border: none;
+    border-radius: 10px;
+    padding: 13px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #fff;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+  }
+
+  .btn-primary:hover { opacity: 0.9; }
+  .btn-primary:active { transform: scale(0.98); }
+
+  .error-msg {
+    background: rgba(255,71,87,0.1);
+    border: 1px solid var(--danger);
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 13px;
+    color: var(--danger);
+    margin-top: 12px;
+    display: none;
+  }
+
+  /* ADMIN PANEL */
+  #admin-panel { display: none; }
+
+  .topbar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky; top: 0; z-index: 10;
+  }
+
+  .topbar-brand {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 16px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .topbar-right { display: flex; align-items: center; gap: 16px; }
+
+  .topbar-right button {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 14px;
+    color: var(--muted);
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .topbar-right button:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .main {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 32px 24px;
+  }
+
+  /* STATS */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+  }
+
+  .stat-card .label {
+    font-size: 12px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+
+  .stat-card .value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 28px;
+    font-weight: 700;
+  }
+
+  .stat-card.total .value { color: var(--accent); }
+  .stat-card.active .value { color: var(--green); }
+  .stat-card.expired .value { color: var(--danger); }
+
+  /* ADD KEY FORM */
+  .section-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 14px;
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+  }
+
+  .add-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 12px;
+    align-items: end;
+  }
+
+  .form-group label {
+    display: block;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  .form-group input,
+  .form-group select {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 14px;
+    color: var(--text);
+    outline: none;
+    font-family: 'JetBrains Mono', monospace;
+    transition: border-color 0.2s;
+  }
+
+  .form-group input:focus,
+  .form-group select:focus {
+    border-color: var(--accent);
+  }
+
+  .form-group select option { background: var(--surface); }
+
+  .btn-add {
+    background: linear-gradient(135deg, var(--accent2), #00b894);
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #000;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: opacity 0.2s;
+  }
+
+  .btn-add:hover { opacity: 0.85; }
+
+  .btn-gen {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: var(--accent);
+    cursor: pointer;
+    font-family: 'JetBrains Mono', monospace;
+    margin-top: 6px;
+    transition: border-color 0.2s;
+    width: 100%;
+  }
+
+  .btn-gen:hover { border-color: var(--accent); }
+
+  /* KEY TABLE */
+  .table-wrap { overflow-x: auto; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  thead tr {
+    border-bottom: 1px solid var(--border);
+  }
+
+  th {
+    text-align: left;
+    padding: 10px 14px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+  }
+
+  td {
+    padding: 12px 14px;
+    border-bottom: 1px solid rgba(42,42,61,0.5);
+    vertical-align: middle;
+  }
+
+  tr:last-child td { border-bottom: none; }
+
+  tr:hover td { background: rgba(108,99,255,0.04); }
+
+  .key-mono {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--accent2);
+    cursor: pointer;
+  }
+
+  .key-mono:hover { opacity: 0.8; }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  .badge-active { background: rgba(46,213,115,0.15); color: var(--green); }
+  .badge-expired { background: rgba(255,71,87,0.12); color: var(--danger); }
+  .badge-soon { background: rgba(255,165,2,0.12); color: var(--warn); }
+
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+  .btn-revoke {
+    background: rgba(255,71,87,0.1);
+    border: 1px solid rgba(255,71,87,0.3);
+    border-radius: 6px;
+    padding: 4px 12px;
+    color: var(--danger);
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-revoke:hover {
+    background: rgba(255,71,87,0.2);
+  }
+
+  .btn-copy {
+    background: rgba(108,99,255,0.1);
+    border: 1px solid rgba(108,99,255,0.2);
+    border-radius: 6px;
+    padding: 4px 10px;
+    color: var(--accent);
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-right: 6px;
+  }
+
+  .btn-copy:hover { background: rgba(108,99,255,0.2); }
+
+  .empty-state {
+    text-align: center;
+    padding: 48px;
+    color: var(--muted);
+  }
+
+  .empty-state .icon { font-size: 40px; margin-bottom: 12px; }
+  .empty-state p { font-size: 14px; }
+
+  /* API SECTION */
+  .api-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    margin-top: 12px;
+  }
+
+  .api-box code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--accent2);
+    line-height: 1.8;
+  }
+
+  .api-url {
+    background: rgba(0,212,170,0.1);
+    border: 1px solid rgba(0,212,170,0.2);
+    border-radius: 6px;
+    padding: 8px 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--accent2);
+    word-break: break-all;
+    margin-bottom: 10px;
+  }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 24px; right: 24px;
+    background: var(--card);
+    border: 1px solid var(--accent2);
+    border-radius: 10px;
+    padding: 12px 20px;
+    font-size: 13px;
+    color: var(--accent2);
+    z-index: 100;
+    transform: translateY(100px);
+    opacity: 0;
+    transition: all 0.3s;
+  }
+
+  .toast.show {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  .search-bar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .search-bar input {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 9px 14px;
+    font-size: 13px;
+    color: var(--text);
+    outline: none;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .search-bar input:focus { border-color: var(--accent); }
+
+  @media (max-width: 600px) {
+    .stats-grid { grid-template-columns: 1fr; }
+    .add-form { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">🔐</div>
+    <h2>Admin Panel</h2>
+    <p>Kirish uchun parolni kiriting</p>
+    <div class="input-wrap">
+      <input type="password" id="admin-pass" placeholder="Admin parol..." onkeydown="if(event.key==='Enter') adminLogin()">
+      <button class="toggle-pw" onclick="togglePw()">👁</button>
+    </div>
+    <button class="btn-primary" onclick="adminLogin()">Kirish</button>
+    <div class="error-msg" id="login-error">❌ Noto'g'ri parol!</div>
+  </div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div id="admin-panel">
+  <div class="topbar">
+    <span class="topbar-brand">⚡ KeySystem Admin</span>
+    <div class="topbar-right">
+      <span style="font-size:13px;color:var(--muted);">Admin</span>
+      <button onclick="logout()">Chiqish</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <!-- STATS -->
+    <div class="stats-grid">
+      <div class="stat-card total">
+        <div class="label">Jami Keylar</div>
+        <div class="value" id="stat-total">0</div>
+      </div>
+      <div class="stat-card active">
+        <div class="label">Faol</div>
+        <div class="value" id="stat-active">0</div>
+      </div>
+      <div class="stat-card expired">
+        <div class="label">Muddati o'tgan</div>
+        <div class="value" id="stat-expired">0</div>
+      </div>
+    </div>
+
+    <!-- ADD KEY -->
+    <div class="section-title">Yangi Key Qo'shish</div>
+    <div class="card">
+      <div class="add-form">
+        <div class="form-group">
+          <label>Key (yoki avtomatik yarating)</label>
+          <input type="text" id="new-key" placeholder="KEY-XXXX-XXXX">
+          <button class="btn-gen" onclick="generateKey()">🎲 Avtomatik yaratish</button>
+        </div>
+        <div class="form-group">
+          <label>Muddat</label>
+          <select id="key-duration">
+            <option value="1">1 kun</option>
+            <option value="3">3 kun</option>
+            <option value="7">7 kun</option>
+            <option value="14">14 kun</option>
+            <option value="30" selected>30 kun</option>
+            <option value="90">90 kun</option>
+            <option value="365">1 yil</option>
+            <option value="0">Cheksiz</option>
+          </select>
+        </div>
+        <button class="btn-add" onclick="addKey()">+ Qo'shish</button>
+      </div>
+    </div>
+
+    <!-- API INFO -->
+    <div class="section-title">APK Integratsiya</div>
+    <div class="card">
+      <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">APK ichidan key tekshirish uchun quyidagi JSON faylni serverga joylang:</p>
+      <div class="api-url">📁 keys.json — bu fayl serverda saqlanadi va APK shu faylni o'qiydi</div>
+      <div class="api-box">
+        <code>
+          // keys.json tuzilishi:<br>
+          {<br>
+          &nbsp;&nbsp;"keys": [<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;{<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"key": "KEY-ABC123",<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"expiry": "2025-12-31",<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"active": true<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;}<br>
+          &nbsp;&nbsp;]<br>
+          }
+        </code>
+      </div>
+      <div style="margin-top:14px;">
+        <button class="btn-gen" onclick="exportJson()" style="width:auto;padding:8px 20px;">📥 keys.json yuklab olish</button>
+        &nbsp;
+        <button class="btn-gen" onclick="copyJson()" style="width:auto;padding:8px 20px;">📋 JSON nusxalash</button>
+      </div>
+    </div>
+
+    <!-- KEY LIST -->
+    <div class="section-title">Keylar Ro'yxati</div>
+    <div class="card">
+      <div class="search-bar">
+        <input type="text" id="search-input" placeholder="🔍 Key qidirish..." oninput="renderTable()">
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Key</th>
+              <th>Yaratilgan</th>
+              <th>Tugash sanasi</th>
+              <th>Holat</th>
+              <th>Amallar</th>
+            </tr>
+          </thead>
+          <tbody id="key-table-body"></tbody>
+        </table>
+        <div class="empty-state" id="empty-state" style="display:none">
+          <div class="icon">🗝️</div>
+          <p>Hali key qo'shilmagan</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// =============================================
+// CONFIG — BU YERDA ADMIN PAROLNI O'ZGARTIRING
+// =============================================
+const ADMIN_PASSWORD = "admin123"; // ← O'ZGARTIRING!
+
+// localStorage'dan keylarni yuklash
+let keys = JSON.parse(localStorage.getItem('app_keys') || '[]');
+
+function saveKeys() {
+  localStorage.setItem('app_keys', JSON.stringify(keys));
+}
+
+// =============================================
+// LOGIN
+// =============================================
+function adminLogin() {
+  const pass = document.getElementById('admin-pass').value;
+  if (pass === ADMIN_PASSWORD) {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('admin-panel').style.display = 'block';
+    renderTable();
+    updateStats();
+  } else {
+    const err = document.getElementById('login-error');
+    err.style.display = 'block';
+    document.getElementById('admin-pass').value = '';
+    setTimeout(() => err.style.display = 'none', 3000);
+  }
+}
+
+function logout() {
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('admin-panel').style.display = 'none';
+  document.getElementById('admin-pass').value = '';
+}
+
+function togglePw() {
+  const inp = document.getElementById('admin-pass');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+
+// =============================================
+// KEY GENERATSIYA
+// =============================================
+function generateKey() {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  const rand = (n) => Array.from({length:n}, () => chars[Math.floor(Math.random()*chars.length)]).join('');
+  document.getElementById('new-key').value = `KEY-${rand(4)}-${rand(4)}-${rand(4)}`;
+}
+
+function addKey() {
+  const keyVal = document.getElementById('new-key').value.trim().toUpperCase();
+  const days = parseInt(document.getElementById('key-duration').value);
+
+  if (!keyVal) { showToast('❗ Key kiriting yoki avtomatik yarating'); return; }
+  if (keys.find(k => k.key === keyVal)) { showToast('⚠️ Bu key allaqachon mavjud!'); return; }
+
+  const now = new Date();
+  let expiry = null;
+  if (days > 0) {
+    const exp = new Date(now);
+    exp.setDate(exp.getDate() + days);
+    expiry = exp.toISOString().split('T')[0];
+  }
+
+  keys.unshift({
+    key: keyVal,
+    created: now.toISOString().split('T')[0],
+    expiry: expiry,
+    active: true
+  });
+
+  saveKeys();
+  renderTable();
+  updateStats();
+  document.getElementById('new-key').value = '';
+  showToast('✅ Key muvaffaqiyatli qo\'shildi!');
+}
+
+function revokeKey(key) {
+  if (!confirm(`"${key}" keyini o'chirishni tasdiqlaysizmi?`)) return;
+  keys = keys.filter(k => k.key !== key);
+  saveKeys();
+  renderTable();
+  updateStats();
+  showToast('🗑️ Key o\'chirildi');
+}
+
+function copyKey(key) {
+  navigator.clipboard.writeText(key);
+  showToast('📋 Key nusxalandi!');
+}
+
+// =============================================
+// HOLAT TEKSHIRISH
+// =============================================
+function getStatus(k) {
+  if (!k.active) return 'expired';
+  if (!k.expiry) return 'active'; // cheksiz
+  const now = new Date();
+  const exp = new Date(k.expiry);
+  const diff = Math.ceil((exp - now) / 86400000);
+  if (diff < 0) return 'expired';
+  if (diff <= 3) return 'soon';
+  return 'active';
+}
+
+function getRemainingDays(k) {
+  if (!k.expiry) return '∞ Cheksiz';
+  const exp = new Date(k.expiry);
+  const now = new Date();
+  const diff = Math.ceil((exp - now) / 86400000);
+  if (diff < 0) return 'Muddati o\'tgan';
+  if (diff === 0) return 'Bugun tugaydi!';
+  return `${diff} kun qoldi`;
+}
+
+// =============================================
+// RENDER
+// =============================================
+function renderTable() {
+  const q = (document.getElementById('search-input')?.value || '').toLowerCase();
+  const filtered = keys.filter(k => k.key.toLowerCase().includes(q));
+  const tbody = document.getElementById('key-table-body');
+
+  document.getElementById('empty-state').style.display = filtered.length ? 'none' : 'block';
+
+  tbody.innerHTML = filtered.map((k, i) => {
+    const status = getStatus(k);
+    const badges = {
+      active: '<span class="badge badge-active"><span class="dot"></span>Faol</span>',
+      expired: '<span class="badge badge-expired"><span class="dot"></span>Muddati o\'tgan</span>',
+      soon: '<span class="badge badge-soon"><span class="dot"></span>Tez tugaydi</span>'
+    };
+    return `
+      <tr>
+        <td style="color:var(--muted);font-size:12px">${i+1}</td>
+        <td><span class="key-mono" onclick="copyKey('${k.key}')" title="Nusxalash">${k.key}</span></td>
+        <td style="color:var(--muted);font-size:12px">${k.created}</td>
+        <td style="font-size:12px">${k.expiry ? `${k.expiry} <span style="color:var(--muted)">(${getRemainingDays(k)})</span>` : '<span style="color:var(--accent2)">∞ Cheksiz</span>'}</td>
+        <td>${badges[status]}</td>
+        <td>
+          <button class="btn-copy" onclick="copyKey('${k.key}')">📋</button>
+          <button class="btn-revoke" onclick="revokeKey('${k.key}')">O'chirish</button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function updateStats() {
+  const total = keys.length;
+  const active = keys.filter(k => getStatus(k) !== 'expired').length;
+  const expired = keys.filter(k => getStatus(k) === 'expired').length;
+  document.getElementById('stat-total').textContent = total;
+  document.getElementById('stat-active').textContent = active;
+  document.getElementById('stat-expired').textContent = expired;
+}
+
+// =============================================
+// EXPORT
+// =============================================
+function getJsonData() {
+  return JSON.stringify({
+    keys: keys.map(k => ({
+      key: k.key,
+      expiry: k.expiry || null,
+      active: getStatus(k) !== 'expired'
+    }))
+  }, null, 2);
+}
+
+function exportJson() {
+  const blob = new Blob([getJsonData()], {type: 'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'keys.json';
+  a.click();
+  showToast('📥 keys.json yuklab olindi!');
+}
+
+function copyJson() {
+  navigator.clipboard.writeText(getJsonData());
+  showToast('📋 JSON nusxalandi!');
+}
+
+// =============================================
+// TOAST
+// =============================================
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// Enter bilan login
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && document.getElementById('login-screen').style.display !== 'none') {
+    adminLogin();
+  }
+});
+</script>
+
+</body>
+</html>
